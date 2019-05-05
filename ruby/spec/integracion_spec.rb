@@ -3,16 +3,16 @@ class Pila
 
 	invariant { capacity >= 0}
 
-	post {empty?}
-	def initialize(capacity)
-		@capacity = capacity
+	post { empty?}
+	def initialize(capacidad)
+		@capacity = capacidad
 		@current_node = nil
 	end
 
-	pre {!full?}
-	post {height > 0}
-	def push(element)
-		@current_node = Node.new(element, @current_node)
+	pre {pp "------Soy pre------, height: #{height}, elem: #{elem}"; !full?}
+	def push(elem)
+		pp "Soy push"
+		@current_node = Node.new(elem, @current_node)
 	end
 
 	pre {!empty?}
@@ -36,7 +36,7 @@ class Pila
 	end
 
 	def full?
-		height == @capacity
+		height == capacity
 	end
 
 	Node = Struct.new(:element, :next_node) do
@@ -58,12 +58,6 @@ describe Pila do
 	end
 
 	it 'debería no poder exceder su capacidad máxima' do
-=begin
-			described_class.define_method(:push_no_precondition) {
-				|element| @current_node = Pila::Node.new(element, @current_node)
-			}
-=end
-
 		pila.push("1")
 		pila.push("2")
 		expect{pila.push("3")}.to raise_error(RuntimeError, "Failed to meet preconditions")

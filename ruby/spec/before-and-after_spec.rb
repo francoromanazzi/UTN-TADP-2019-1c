@@ -98,4 +98,14 @@ describe '#before_and_after_each_call' do
 			remove_method(:metodo_de_clase)
 		end
 	end
+
+	it 'debería no afectar el estado de otras instancias de esa clase' do
+		otro_clase1 = Clase1.new
+
+		clase1.foo
+		clase1.foo
+		clase1.foo
+
+		expect(otro_clase1.contador).to be 1 # 1 ya que solo cuenta el mensaje contador
+	end
 end

@@ -56,16 +56,21 @@ describe '#pre-post-conditions' do
 
 	it 'debería poder definir la postcondicion antes de la precondicion' do
 		class ClaseTest3
-			post{|res| res < 0}
-			pre{x > 0}
+			post {|res| res > 16}
+			pre {x > 0}
 			def foo(x)
 				x * x
 			end
 		end
-		expect{ClaseTest3.new.foo(4)}.to raise_error(RuntimeError, "Failed to meet postconditions")
+
+		clase_test3 = ClaseTest3.new
+
+		expect{clase_test3.foo(-1)}.to raise_error(RuntimeError, "Failed to meet preconditions")
+		expect{clase_test3.foo(2)}.to raise_error(RuntimeError, "Failed to meet postconditions")
+		expect(clase_test3.foo(8)).to be 64
 	end
 
-	it 'debería no pisar una variable de instancia del mismo nombre que un parámetro' do
+	it 'debería no pisar una variable o método de instancia del mismo nombre que un parámetro' do
 
 		class ClaseTest4
 			attr_accessor :var_instancia
@@ -85,5 +90,11 @@ describe '#pre-post-conditions' do
 		clase_test4.foo(4)
 
 		expect(clase_test4.var_instancia).to be 555
+	end
+
+	it 'debería no contaminar el objeto con los parámetros' do
+		op.division_entera_sin_resto(4, 2)
+		expect(op.respond_to? :dividendo).to be false
+		expect(op.respond_to? :divisor).to be false
 	end
 end
