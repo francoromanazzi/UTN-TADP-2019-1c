@@ -64,29 +64,14 @@ class Module
 		return @break_recursitivy = false if @break_recursitivy ||= false
 		@break_recursitivy = true
 
+		# Si había pre/post esperando a que se defina el método, bindearselo
+		bind_unbound_method_contracts(method_name)
+
 		override_method(method_name)
 	end
 
 	def override_existing_methods
 		instance_methods.each {|method_name| override_method(method_name)}
-	end
-
-	def bind_unbound_method_contract_to_next_method(unbound_method_contract)
-		contracts << unbound_method_contract
-
-		if contracts.filter{ |contract| contract.is_a? UnboundMethodContract }.size == 1
-			@original_method_added ||= method(:method_added)
-
-			define_singleton_method(:method_added) do |method_name|
-				bind_unbound_method_contracts(method_name)
-
-				define_singleton_method(:method_added) do |method_name|
-					@original_method_added.(method_name)
-				end
-
-				method_added(method_name)
-			end
-		end
 	end
 
 	def before_and_after_each_call(proc_before, proc_after)
@@ -102,12 +87,12 @@ class Module
 
 	def pre(&block)
 		raise "Precondition already defined" if contracts.any? {|contract| contract.is_a?(UnboundMethodContract) and contract.exec_moment == :before}
-		bind_unbound_method_contract_to_next_method(UnboundMethodContract.new(:before, proc {raise "Failed to meet preconditions" unless instance_eval(&block)}))
+		contracts << UnboundMethodContract.new(:before, proc {raise "Failed to meet preconditions" unless instance_eval(&block)})
 	end
 
 	def post(&block)
 		raise "Postcondition already defined" if contracts.any? {|contract| contract.is_a?(UnboundMethodContract) and contract.exec_moment == :after}
-		bind_unbound_method_contract_to_next_method(UnboundMethodContract.new(:after, proc {|res| raise "Failed to meet postconditions" unless instance_exec(res, &block)}))
+		contracts << UnboundMethodContract.new(:after, proc {|res| raise "Failed to meet postconditions" unless instance_exec(res, &block)})
 	end
 end
 
