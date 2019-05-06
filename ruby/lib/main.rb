@@ -19,9 +19,6 @@ class Module
 		define_method(method_name) do |*args, &block|
 			original_method_bounded = original_method.bind(self)
 
-			pp "INVOKED PUSH" if method_name == :push # DEBUG
-			pp "INVOKED ELEM" if method_name == :elem # DEBUG
-
 			# No ejecutar los contratos de los métodos que fueron llamados por otros métodos (ya que no fueron los receptores del mensaje)
 			return original_method_bounded.(*args, &block) if caller.any? {|stack| Regexp.new('^' + __FILE__).match(stack)}
 
@@ -33,7 +30,6 @@ class Module
 			args.each_with_index do |arg, i|
 				new_method_name = original_method.parameters[i][1]
 				overwritten_methods[new_method_name] = self.class.instance_method(new_method_name).bind(self) if self.class.method_defined?(new_method_name)
-				pp "define_singleton_method: #{new_method_name} por el metodo #{method_name}" # DEBUG
 				define_singleton_method(new_method_name) {arg}
 			end
 
@@ -45,8 +41,8 @@ class Module
 
 			# Borrar los métodos args agregados temporalmente en la autoclase del objeto
 			args.each_index do |i|
-				method_name = original_method.parameters[i][1]
-				singleton_class.send :undef_method, method_name
+				method_name_arg = original_method.parameters[i][1]
+				singleton_class.send :undef_method, method_name_arg
 			end
 			# Restaurar los métodos anteriores que pudieron haber sido sobreescritos
 			overwritten_methods.each do |method_name, bound_method|

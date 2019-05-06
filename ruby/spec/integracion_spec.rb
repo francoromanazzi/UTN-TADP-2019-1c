@@ -3,16 +3,17 @@ class Pila
 
 	invariant { capacity >= 0}
 
-	post { empty?}
-	def initialize(capacidad)
-		@capacity = capacidad
+	post { empty? }
+	def initialize(capacity)
+		@capacity = capacity
 		@current_node = nil
 	end
 
-	pre {pp "------Soy pre------, height: #{height}, elem: #{elem}"; !full?}
-	def push(elem)
+	pre { !full? }
+	post { height > 0 }
+	def push(element)
 		pp "Soy push"
-		@current_node = Node.new(elem, @current_node)
+		@current_node = Node.new(element, @current_node)
 	end
 
 	pre {!empty?}
