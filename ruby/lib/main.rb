@@ -5,7 +5,7 @@ class Module
 
 	def valid_before_and_after_contracts(method_name)
 		valid_contracts_by_exec_moment = proc do |exec_moment|
-			contracts.filter {|contract| contract.exec_moment == exec_moment && contract.valid_with_method?(method_name)}
+			contracts.select {|contract| contract.exec_moment == exec_moment && contract.valid_with_method?(method_name)}
 		end
 
 		valid_before_contracts = valid_contracts_by_exec_moment.call(:before)
@@ -74,7 +74,7 @@ class Module
 	def bind_unbound_method_contract_to_next_method(unbound_method_contract)
 		contracts << unbound_method_contract
 
-		if contracts.filter{ |contract| contract.is_a? UnboundMethodContract }.size == 1
+		if contracts.select { |contract| contract.is_a? UnboundMethodContract }.size == 1
 			@original_method_added ||= method(:method_added)
 
 			define_singleton_method(:method_added) do |method_name|

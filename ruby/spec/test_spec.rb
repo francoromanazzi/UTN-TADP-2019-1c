@@ -1,5 +1,5 @@
-describe Contrato do
-  let(:contrato) { Contrato.new }
+describe Contract do
+  let(:contrato) { Contract.new }
   let(:pre) { Proc.new { print "A" } }
   let(:post) { Proc.new { print "C" } }
 
