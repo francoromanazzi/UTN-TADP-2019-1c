@@ -74,7 +74,7 @@ class Module
 	def bind_unbound_method_contract_to_next_method(unbound_method_contract)
 		contracts << unbound_method_contract
 
-		if contracts.filter{ |contract| contract.is_a? UnboundMethodContract }.size == 1
+		if contracts.filter {|contract| contract.is_a? UnboundMethodContract}.size == 1
 			@original_method_added ||= method(:method_added)
 
 			define_singleton_method(:method_added) do |method_name|
@@ -108,6 +108,17 @@ class Module
 	def post(&block)
 		raise "Postcondition already defined" if contracts.any? {|contract| contract.is_a?(UnboundMethodContract) and contract.exec_moment == :after}
 		bind_unbound_method_contract_to_next_method(UnboundMethodContract.new(:after, proc {|res| raise "Failed to meet postconditions" unless instance_exec(res, &block)}))
+	end
+
+	def typed(parametros, tipo_retorno)
+		pre(&proc {
+			parametros.all? do |identificador, tipo|
+				metodo = method(identificador)
+				metodo.call.is_a? tipo
+			end
+		})
+
+		post(&proc {|res| res.is_a? tipo_retorno})
 	end
 end
 

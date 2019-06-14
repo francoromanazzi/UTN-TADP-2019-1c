@@ -101,5 +101,12 @@ class MusicParserTest extends FreeSpec with Matchers {
           List(A, B, F, G, A, A, F, G, A, A, F, G, A, A, A, B, F, G, A, A, F, G, A, A, F, G, A, A, F, B, E))
       }
     }
+
+    "when fed a text that contains a two digit repetition" - {
+      "it parses a list with that note apearing twelve times" in {
+        assertParsesSucceededWithResult(new MusicParser("12x(A)").parse(),
+          List(A, A, A, A, A, A, A, A, A, A, A, A))
+      }
+    }
   }
 }
