@@ -42,13 +42,18 @@ class MusicParser(input: String) {
         if(next != '(') throw new RepetitionSyntaxException
 
         var stringAMultiplicar: String = ""
+        var parentesisSinCerrar: Int = 0
         do {
           next = parseChar()
-          if(next != ')') stringAMultiplicar += next
-        } while(next != ')')
+          if(next == '(') parentesisSinCerrar += 1
+          else if(next == ')') parentesisSinCerrar -= 1
+
+          stringAMultiplicar += next
+        } while(next != ')' || parentesisSinCerrar >= 0)
+        stringAMultiplicar = stringAMultiplicar.dropRight(1) // le saco el ultimo parentesis
 
         result += stringAMultiplicar * multiplicador
-        println(stringAMultiplicar, multiplicador)
+        println("multiplicando", stringAMultiplicar, multiplicador)
         hasFlattenedRepetition = true
       }
       else {
@@ -59,7 +64,7 @@ class MusicParser(input: String) {
       case _: EOIParserException =>
     }
 
-    println(result, result.size)
+    println("result:", result)
     inputStream = new PushbackReader(new StringReader(result))
 
     hasFlattenedRepetition
