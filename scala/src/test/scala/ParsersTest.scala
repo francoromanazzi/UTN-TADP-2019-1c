@@ -33,5 +33,39 @@ class ParsersTest extends FreeSpec with Matchers {
         }
       }
     }
+
+    "char" - {
+      "when fed an empty string" - {
+        "it fails" in {
+          assertParseFailed(char('H')(""))
+        }
+      }
+
+      "when fed a string with one character" - {
+        "if that string is not equal to that character" - {
+          "it fails" in {
+            assertParseFailed(char('H')("C"))
+          }
+        }
+        "if that string is equal to that character" - {
+          "it parses that character" in {
+            assertParsesSucceededWithResult(char('H')("H"), ('H', ""))
+          }
+        }
+      }
+
+      "when fed a string with more than one character" - {
+        "if that string doesn't start with that that character" - {
+          "it fails" in {
+            assertParseFailed(char('H')("Chau"))
+          }
+        }
+        "if that string starts with that character" - {
+          "it parses that character" in {
+            assertParsesSucceededWithResult(char('H')("Hola"), ('H', "ola"))
+          }
+        }
+      }
+    }
   }
 }
