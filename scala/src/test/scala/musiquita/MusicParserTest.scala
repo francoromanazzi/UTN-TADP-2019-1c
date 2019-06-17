@@ -1,3 +1,5 @@
+package musiquita
+
 import Musica._
 import org.scalatest.{FreeSpec, Matchers}
 
@@ -10,7 +12,7 @@ class MusicParserTest extends FreeSpec with Matchers {
     assertThrows[ParserException](actualResult)
   }
 
-  "MusicParser" - {
+  "musiquita.MusicParser" - {
     "when fed empty text" - {
       "parses an empty list of notes" in {
         assertParsesSucceededWithResult(new MusicParser("").parse(), Nil)

@@ -1,5 +1,9 @@
+package musiquita
+
 import java.io.{PushbackReader, StringReader}
-import Musica._
+
+import musiquita.Musica.Nota
+
 import scala.collection.mutable.ListBuffer
 
 class MusicParser(input: String) {

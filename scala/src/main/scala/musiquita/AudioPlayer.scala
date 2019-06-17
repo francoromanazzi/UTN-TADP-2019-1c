@@ -1,5 +1,7 @@
-import Musica._
+package musiquita
+
 import javax.sound.midi.{MidiChannel, MidiSystem}
+import musiquita.Musica._
 
 object AudioPlayer {
   private val VOLUME = 80

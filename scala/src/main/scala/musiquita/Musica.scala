@@ -1,3 +1,5 @@
+package musiquita
+
 package object Musica {
   object Nota {
     def notas = List(C, Cs, D, Ds, E, F, Fs, G, Gs, A, As, B)
