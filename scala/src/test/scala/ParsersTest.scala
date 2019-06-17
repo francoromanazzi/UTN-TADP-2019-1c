@@ -55,7 +55,7 @@ class ParsersTest extends FreeSpec with Matchers {
       }
 
       "when fed a string with more than one character" - {
-        "if that string doesn't start with that that character" - {
+        "if that string doesn't start with that character" - {
           "it fails" in {
             assertParseFailed(char('H')("Chau"))
           }
@@ -84,6 +84,47 @@ class ParsersTest extends FreeSpec with Matchers {
       "when fed a string with more than one character" - {
         "it parses the first character but discards it" in {
           assertParsesSucceededWithResult(void("Hola"), ((), "ola"))
+        }
+      }
+    }
+
+    "letter" - {
+      "when fed an empty string" - {
+        "it fails" in {
+          assertParseFailed(letter(""))
+        }
+      }
+
+      "when fed a string with one character" - {
+        "if that string is not a letter" - {
+          "it fails" in {
+            assertParseFailed(letter("1"))
+          }
+        }
+        "if that string is a letter" - {
+          "if it is uppercase" - {
+            "it parses that letter" in {
+              assertParsesSucceededWithResult(letter("H"), ('H', ""))
+            }
+          }
+          "if it is lowercase" - {
+            "it parses that letter" in {
+              assertParsesSucceededWithResult(letter("h"), ('h', ""))
+            }
+          }
+        }
+      }
+
+      "when fed a string with more than one character" - {
+        "if that string doesn't start with a letter" - {
+          "it fails" in {
+            assertParseFailed(letter("1Hola"))
+          }
+        }
+        "if that string starts with a letter" - {
+          "it parses that letter" in {
+            assertParsesSucceededWithResult(letter("Hola"), ('H', "ola"))
+          }
         }
       }
     }
