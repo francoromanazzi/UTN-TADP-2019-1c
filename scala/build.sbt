@@ -4,7 +4,7 @@ version := "1"
 
 organization := "edu.ar.utn.tadp"
 
-scalaVersion := "2.12.6"
+scalaVersion := "2.12.8"
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.5" % "test",

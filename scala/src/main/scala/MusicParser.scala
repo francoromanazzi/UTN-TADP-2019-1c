@@ -2,8 +2,6 @@ import java.io.{PushbackReader, StringReader}
 import Musica._
 import scala.collection.mutable.ListBuffer
 
-// case class Note(name: String)
-
 class MusicParser(input: String) {
   protected var inputStream = new PushbackReader(new StringReader(input))
 
@@ -16,7 +14,7 @@ class MusicParser(input: String) {
   protected def parseNote(): Nota = {
     var next: Char = ' '
     do next = parseChar() while (next == ' ')
-    Nota.notas.find(_.toString == next.toString()).getOrElse(throw new NotANoteException(next))
+    Nota.notas.find(_.toString == next.toString).getOrElse(throw new NotANoteException(next))
   }
 
   protected def resolveRepetitions() : Boolean = {
