@@ -67,5 +67,25 @@ class ParsersTest extends FreeSpec with Matchers {
         }
       }
     }
+
+    "void" - {
+      "when fed an empty string" - {
+        "it fails" in {
+          assertParseFailed(void(""))
+        }
+      }
+
+      "when fed a string with one character" - {
+        "it parses that character but discards it" in {
+          assertParsesSucceededWithResult(void("H"), ((), ""))
+        }
+      }
+
+      "when fed a string with more than one character" - {
+        "it parses the first character but discards it" in {
+          assertParsesSucceededWithResult(void("Hola"), ((), "ola"))
+        }
+      }
+    }
   }
 }
