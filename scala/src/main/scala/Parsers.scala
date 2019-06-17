@@ -27,5 +27,8 @@ package object Parsers {
 
   // TODO: preguntar si no solo debería considerar el primer char
   val letter: Parser[Char] = fstCharCondition(_.isLetter)
+
+  // TODO: preguntar si no solo debería considerar el primer char
+  val digit: Parser[Char] = fstCharCondition(_.isDigit)
 }
 

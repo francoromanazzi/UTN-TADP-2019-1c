@@ -128,5 +128,39 @@ class ParsersTest extends FreeSpec with Matchers {
         }
       }
     }
+
+    "digit" - {
+      "when fed an empty string" - {
+        "it fails" in {
+          assertParseFailed(digit(""))
+        }
+      }
+
+      "when fed a string with one character" - {
+        "if that string is not a digit" - {
+          "it fails" in {
+            assertParseFailed(digit("A"))
+          }
+        }
+        "if that string is a digit" - {
+          "it parses that digit" in {
+            assertParsesSucceededWithResult(digit("0"), ('0', ""))
+          }
+        }
+      }
+
+      "when fed a string with more than one character" - {
+        "if that string doesn't start with a digit" - {
+          "it fails" in {
+            assertParseFailed(digit("Hola1"))
+          }
+        }
+        "if that string starts with a digit" - {
+          "it parses that digit" in {
+            assertParsesSucceededWithResult(digit("1Hola"), ('1', "Hola"))
+          }
+        }
+      }
+    }
   }
 }
