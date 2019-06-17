@@ -162,5 +162,104 @@ class ParsersTest extends FreeSpec with Matchers {
         }
       }
     }
+
+    "alphaNum" - {
+      "when fed an empty string" - {
+        "it fails" in {
+          assertParseFailed(alphaNum(""))
+        }
+      }
+
+      "when fed a string with one character" - {
+        "if that string is not alphanum" - {
+          "it fails" in {
+            assertParseFailed(alphaNum("#"))
+          }
+        }
+        "if that string is alphanum" - {
+          "if it is a digit" - {
+            "it parses that digit" in {
+              assertParsesSucceededWithResult(alphaNum("0"), ('0', ""))
+            }
+          }
+          "if it is a letter" - {
+            "it parses that letter" in {
+              assertParsesSucceededWithResult(alphaNum("a"), ('a', ""))
+            }
+          }
+        }
+      }
+
+      "when fed a string with more than one character" - {
+        "if that string doesn't start with alphanum" - {
+          "it fails" in {
+            assertParseFailed(alphaNum("#Hola1"))
+          }
+        }
+        "if that string starts with alphanum" - {
+          "if it is a digit" - {
+            "it parses that digit" in {
+              assertParsesSucceededWithResult(alphaNum("0Hola"), ('0', "Hola"))
+            }
+          }
+          "if it is a letter" - {
+            "it parses that letter" in {
+              assertParsesSucceededWithResult(alphaNum("aHola"), ('a', "Hola"))
+            }
+          }
+        }
+      }
+    }
+
+    "string" - {
+      "when fed an empty string" - {
+        "if the matcher is not an empty string" - {
+          "it fails" in {
+            assertParseFailed(string("Hola")(""))
+          }
+        }
+        "if the matcher is an empty string" - {
+          "it parses the empty string" in {
+            assertParsesSucceededWithResult(string("")(""), ("", ""))
+          }
+        }
+      }
+
+      "when fed a string with one character" - {
+        "if that string is not equal to that character" - {
+          "it fails" in {
+            assertParseFailed(string("Hola")("H"))
+          }
+        }
+        "if that string is equal to that character" - {
+          "it parses that character" in {
+            assertParsesSucceededWithResult(string("H")("H"), ("H", ""))
+          }
+        }
+        "if the matcher is an empty string" - {
+          "it parses the empty string" in {
+            assertParsesSucceededWithResult(string("")("H"), ("", "H"))
+          }
+        }
+      }
+
+      "when fed a string with more than one character" - {
+        "if that string doesn't start with the string matcher" - {
+          "it fails" in {
+            assertParseFailed(string("Hola")("Holgado"))
+          }
+        }
+        "if that string starts with the string matcher" - {
+          "it parses that string" in {
+            assertParsesSucceededWithResult(string("Hola")("HolaMundo!"), ("Hola", "Mundo!"))
+          }
+        }
+        "if the matcher is an empty string" - {
+          "it parses the empty string" in {
+            assertParsesSucceededWithResult(string("")("HolaMundo!"), ("", "HolaMundo!"))
+          }
+        }
+      }
+    }
   }
 }

@@ -63,6 +63,29 @@ class CombinatorsTest extends FreeSpec with Matchers {
         }
       }
     }
-  }
+    "<> (Concat combinator)" - {
+      "when combining string(\"hola\") <> string(\"mundo\")" - {
+        val holamundo: Parser[(String, String)] = string("hola") <> string("mundo")
 
+        "when fed an empty string" - {
+          "it fails" in {
+            assertParseFailed(holamundo(""))
+          }
+        }
+
+        "when fed a string with more than one character" - {
+          "if that string doesn't start with both the strings in the two parsers" - {
+            "it fails" in {
+              assertParseFailed(holamundo("holachau"))
+            }
+          }
+          "if that string starts with both the strings in the two parsers" - {
+            "it parses the two strings" in {
+              assertParsesSucceededWithResult(holamundo("holamundo!"), (("hola", "mundo"), "!"))
+            }
+          }
+        }
+      }
+    }
+  }
 }

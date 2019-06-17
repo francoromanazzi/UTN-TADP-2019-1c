@@ -1,4 +1,5 @@
-import scala.util.{Try}
+import Combinators._
+import scala.util.Try
 
 package object Parsers {
   type Input = String
@@ -17,7 +18,6 @@ package object Parsers {
   // TODO: mejorar el manejo de excepciones
   val anyChar: Parser[Char] = fstCharCondition(_ => true)
 
-  // TODO: preguntar si no solo debería considerar el primer char
   val char: Char => Parser[Char] = char => fstCharCondition(_ == char)
 
   // TODO: preguntar si el string sin consumir debería ser todo el input en vez de sacarle el primer char
@@ -25,10 +25,18 @@ package object Parsers {
     (Unit, anyChar(input).get._2)
   }
 
-  // TODO: preguntar si no solo debería considerar el primer char
   val letter: Parser[Char] = fstCharCondition(_.isLetter)
 
-  // TODO: preguntar si no solo debería considerar el primer char
   val digit: Parser[Char] = fstCharCondition(_.isDigit)
+
+  val alphaNum: Parser[Char] = letter <|> digit
+
+  val string: String => Parser[String] = target => input => Try {
+    var resultParsed: String = ""
+    for((c, i) <- target.zipWithIndex) {
+      resultParsed += char(c)(input.substring(i)).get._1.toString
+    }
+    (resultParsed, input.substring(target.length))
+  }
 }
 
