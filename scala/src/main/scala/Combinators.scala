@@ -14,5 +14,17 @@ package object Combinators {
       val (resultParser2, restoParser2) = parser2(restoParser1).get
       ((resultParser1, resultParser2), restoParser2)
     }
+
+    // TODO testearlo
+    def ~>(parser2: Parser[T]): Parser[T] = input => Try {
+      val ((_, resultParser2), restoParser2) = (parser1 <> parser2)(input).get
+      (resultParser2, restoParser2)
+    }
+
+    // TODO testearlo
+    def <~(parser2: Parser[T]): Parser[T] = input => Try {
+      val ((resultParser1, _), restoParser2) = (parser1 <> parser2)(input).get
+      (resultParser1, restoParser2)
+    }
   }
 }
