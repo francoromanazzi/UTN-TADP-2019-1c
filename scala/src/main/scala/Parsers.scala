@@ -1,5 +1,6 @@
 import Combinators._
-import scala.util.Try
+
+import scala.util.{Success, Try}
 
 package object Parsers {
   type Input = String

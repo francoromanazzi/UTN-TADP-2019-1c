@@ -55,7 +55,6 @@ class MusicParser(input: String) {
         stringAMultiplicar = stringAMultiplicar.dropRight(1) // le saco el ultimo parentesis
 
         result += stringAMultiplicar * multiplicador
-        println("multiplicando", stringAMultiplicar, multiplicador)
         hasFlattenedRepetition = true
       }
       else {
@@ -66,7 +65,6 @@ class MusicParser(input: String) {
       case _: EOIParserException =>
     }
 
-    println("result:", result)
     inputStream = new PushbackReader(new StringReader(result))
 
     hasFlattenedRepetition
