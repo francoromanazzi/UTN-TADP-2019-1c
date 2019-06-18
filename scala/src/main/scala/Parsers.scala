@@ -16,6 +16,8 @@ package object Parsers {
     }
   }
 
+  def anything[T]: Parser[T] = input => Success((().asInstanceOf[T], input))
+
   // TODO: mejorar el manejo de excepciones
   val anyChar: Parser[Char] = fstCharCondition(_ => true)
 

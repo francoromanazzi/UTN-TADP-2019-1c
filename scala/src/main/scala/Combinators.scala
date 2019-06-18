@@ -1,6 +1,6 @@
 import Parsers._
 
-import scala.util.{Success, Try}
+import scala.util.Try
 
 package object Combinators {
 
@@ -46,7 +46,7 @@ package object Combinators {
     }
 
     // TODO testearlo
-    def opt: Parser[T] = ???
+    def opt: Parser[T] = parser1 <|> anything
 
     // TODO testearlo
     def * : Parser[List[T]] = input => ???

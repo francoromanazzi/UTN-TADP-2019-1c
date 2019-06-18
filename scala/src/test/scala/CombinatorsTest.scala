@@ -88,4 +88,8 @@ class CombinatorsTest extends FreeSpec with Matchers {
       }
     }
   }
+
+  "Operaciones" - {
+
+  }
 }
