@@ -5,11 +5,6 @@ import scala.util.Try
 package object Combinators {
 
   implicit class ParserExtendido[T](parser1: Parser[T]) {
-
-    sealed trait Nullable
-    case class SomeValue(value: T) extends Nullable
-    case class NullValue(value: Unit) extends Nullable
-
     def <|>(parser2: Parser[T]): Parser[T] = input => Try {
       parser1(input).getOrElse(parser2(input).get)
     }
