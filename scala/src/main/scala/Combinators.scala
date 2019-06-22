@@ -5,9 +5,12 @@ import scala.util.Try
 package object Combinators {
 
   implicit class ParserExtendido[T](parser1: Parser[T]) {
-    def <|>(parser2: Parser[T]): Parser[T] = input => Try {
-      parser1(input).getOrElse(parser2(input).get)
-    }
+    def <|>[U <: T](parser2: Parser[U]): Parser[U] = input => parser1(input).recoverWith{ case _ => parser2(input)}
+
+      //.fold(_ => parser2(input), parseado => parseado)
+
+
+      //Try {parser1(input).getOrElse(parser2(input).get)}
 
     def <>[U](parser2: Parser[U]): Parser[(T, U)] = input => Try {
       val (resultParser1, restoParser1) = parser1(input).get
@@ -41,10 +44,11 @@ package object Combinators {
     }
 
     // TODO testearlo
-    def opt: Parser[T] = parser1 <|> anything
+    def opt: Parser[T] = parser1
 
     // TODO testearlo
     def * : Parser[List[T]] = input => ???
+    // ver recover, fold
 
     // TODO testearlo
     def + : Parser[List[T]] = input => ???
