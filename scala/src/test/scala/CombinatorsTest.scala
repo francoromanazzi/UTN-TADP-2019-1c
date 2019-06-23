@@ -10,7 +10,9 @@ class CombinatorsTest extends FreeSpec with Matchers {
   }
 
   def assertParseFailed[T](actualResult: ⇒ Try[Parseado[T]]): Unit = {
-    intercept[ParserException] { actualResult.get }
+    intercept[ParserException] {
+      actualResult.get
+    }
   }
 
   "Combinators" - {
@@ -60,6 +62,46 @@ class CombinatorsTest extends FreeSpec with Matchers {
           }
         }
       }
+      "when combining string(\"ab\") <|> char('a')" - {
+        val abOrA: Parser[Any] = string("ab") <|> char('a')
+
+        "when fed an empty string" - {
+          "it fails" in {
+            assertParseFailed(abOrA(""))
+          }
+        }
+
+        "when fed a string with one character" - {
+          "if that string is not equal to the char in the 2nd parser" - {
+            "it fails" in {
+              assertParseFailed(abOrA("c"))
+            }
+          }
+          "if that string is equal to the char in the second parser" - {
+            "it parses that character" in {
+              assertParsesSucceededWithResult(abOrA("a"), ('a', ""))
+            }
+          }
+        }
+
+        "when fed a string with more than one character" - {
+          "if that string doesn't match any of the parsers" - {
+            "it fails" in {
+              assertParseFailed(abOrA("cab"))
+            }
+          }
+          "if that string starts with the string in the 1st parser" - {
+            "it parses that char in the first parser" in {
+              assertParsesSucceededWithResult(abOrA("abab"), ("ab", "ab"))
+            }
+          }
+          "if that string starts with the char in the 2nd parser" - {
+            "it parses that char in the second parser" in {
+              assertParsesSucceededWithResult(abOrA("aab"), ('a', "ab"))
+            }
+          }
+        }
+      }
     }
     "<> (Concat combinator)" - {
       "when combining string(\"hola\") <> string(\"mundo\")" - {
@@ -84,10 +126,73 @@ class CombinatorsTest extends FreeSpec with Matchers {
           }
         }
       }
+      "when combining digit <> string(\"mundo\")" - {
+        val digitMundo: Parser[(Char, String)] = digit <> string("mundo")
+
+        "when fed an empty string" - {
+          "it fails" in {
+            assertParseFailed(digitMundo(""))
+          }
+        }
+
+        "when fed a string with more than one character" - {
+          "if that string doesn't match the two parsers" - {
+            "it fails" in {
+              assertParseFailed(digitMundo("12mundo!"))
+            }
+          }
+          "if that string matches the two parsers" - {
+            "it parses the two strings" in {
+              assertParsesSucceededWithResult(digitMundo("1mundo!"), (('1', "mundo"), "!"))
+            }
+          }
+        }
+      }
     }
   }
 
-  "Operaciones" - {
+  "Operations" - {
+    "sepBy" - {
+      "when parsing a telephone number like 4501-2251" - {
+        val telNum: Parser[(Int, Int)] = integer.sepBy(char('-'))
 
+        "when fed an empty string" - {
+          "it fails" in {
+            assertParseFailed(telNum(""))
+          }
+        }
+
+        "when fed a string with one character" - {
+          "if that string is a digit" - {
+            "it fails" in {
+              assertParseFailed(telNum("1"))
+            }
+          }
+          "if that string is a hyphen" - {
+            "it fails" in {
+              assertParseFailed(telNum("-"))
+            }
+          }
+        }
+
+        "when fed a string with more than one character" - {
+          "if that string is only digits" - {
+            "it fails" in {
+              assertParseFailed(telNum("4501"))
+            }
+          }
+          "if that string is digits separated by a space" - {
+            "it fails" in {
+              assertParseFailed(telNum("4501 2251"))
+            }
+          }
+          "if that string is digits separated by a hyphen" - {
+            "it parses that telephone number" in {
+              assertParsesSucceededWithResult(telNum("4501-2251hola"), ((4501, 2251), "hola"))
+            }
+          }
+        }
+      }
+    }
   }
 }

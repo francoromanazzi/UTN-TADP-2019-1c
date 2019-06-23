@@ -10,7 +10,8 @@ package object Parsers {
   type Parseado[+T] = (T, Input)
   type Parser[+T] = Input => Try[Parseado[T]]
 
-  val success: Parser[Unit] = input => Success((Unit, input))
+  def successWithResult[T](value: T): Parser[T] = input => Success((value, input))
+  val success: Parser[Unit] = successWithResult(Unit)
 
   val anyChar: Parser[Char] = input => Try(input(0), input.substring(1)).recover { case _ => throw new ParserException }
 
@@ -24,11 +25,11 @@ package object Parsers {
 
   val alphaNum: Parser[Char] = letter <|> digit
 
-  // TODO ver como sacar esta funcion auxiliar y usar el success como semilla del fold
-  private val successString: Parser[String] = input => Success(("", input))
-  val string: String => Parser[String] = _.toList.map(char(_)).foldLeft(successString) { (parserAccum: Parser[String], charParser) =>
+  val string: String => Parser[String] = _.toList.map(char(_)).foldLeft(successWithResult("")) { (parserAccum: Parser[String], charParser) =>
     (parserAccum <> charParser)
       .map { case (strAccum, charNuevo) => strAccum + charNuevo.toString }
   }
+
+  val integer: Parser[Int] = digit.+.map(_.mkString.toInt)
 }
 
