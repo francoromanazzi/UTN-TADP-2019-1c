@@ -1,18 +1,16 @@
 import Combinators._
-import Parsers._
-import Parsers.{Parseado, char}
+import Parsers.{Parseado, char, _}
 import org.scalatest.{FreeSpec, Matchers}
 
 import scala.util.Try
 
 class CombinatorsTest extends FreeSpec with Matchers {
   def assertParsesSucceededWithResult[T](actualResult: Try[Parseado[T]], expectedResult: Parseado[T]): Unit = {
-    actualResult.isSuccess shouldBe true
     actualResult.get shouldBe expectedResult
   }
 
   def assertParseFailed[T](actualResult: ⇒ Try[Parseado[T]]): Unit = {
-    actualResult.isFailure shouldBe true
+    intercept[ParserException] { actualResult.get }
   }
 
   "Combinators" - {

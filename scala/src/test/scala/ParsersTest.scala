@@ -1,16 +1,15 @@
 import Parsers._
 import org.scalatest.{FreeSpec, Matchers}
 
-import scala.util.{Try}
+import scala.util.Try
 
 class ParsersTest extends FreeSpec with Matchers {
   def assertParsesSucceededWithResult[T](actualResult: Try[Parseado[T]], expectedResult: Parseado[T]): Unit = {
-    actualResult.isSuccess shouldBe true
     actualResult.get shouldBe expectedResult
   }
 
   def assertParseFailed[T](actualResult: ⇒ Try[Parseado[T]]): Unit = {
-    actualResult.isFailure shouldBe true
+    intercept[ParserException] { actualResult.get }
   }
 
   "Parsers" - {

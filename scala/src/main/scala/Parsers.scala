@@ -3,44 +3,31 @@ import Combinators._
 import scala.util.{Success, Try}
 
 package object Parsers {
+
+  final case class ParserException(message: String = "") extends Exception(message)
+
   type Input = String
-
   type Parseado[+T] = (T, Input)
-
   type Parser[+T] = Input => Try[Parseado[T]]
 
-  private val fstCharCondition: (Char => Boolean) => Parser[Char] = condition => input => Try {
-    (input(0), input.substring(1)) match {
-      case (c, resto) if condition(c) => (c, resto)
-      case (c, _) => throw new Exception(s"Input started with $c")
-    }
-  }
+  val success: Parser[Unit] = input => Success((Unit, input))
 
-  def anything[T]: T => Parser[T] = v => input => Try((v, input))
+  val anyChar: Parser[Char] = input => Try(input(0), input.substring(1)).recover { case _ => throw new ParserException }
 
-  // TODO: mejorar el manejo de excepciones
-  val anyChar: Parser[Char] = fstCharCondition(_ => true)
+  val char: Char => Parser[Char] = char => anyChar.satisfies(_ == char)
 
-  val char: Char => Parser[Char] = char => fstCharCondition(_ == char)
+  val void: Parser[Unit] = anyChar.const(Unit)
 
-  // TODO: preguntar si el string sin consumir debería ser todo el input en vez de sacarle el primer char
-  /*
-  val void: Parser[Unit] = input => Try {
-    (Unit, anyChar(input).get._2)
-  }
-   */
+  val letter: Parser[Char] = anyChar.satisfies(_.isLetter)
 
-  val void: Parser[Unit] = input => anyChar(input).map{ case (_, resto) => (Unit, resto)}
-
-  val letter: Parser[Char] = fstCharCondition(_.isLetter)
-
-  val digit: Parser[Char] = fstCharCondition(_.isDigit)
+  val digit: Parser[Char] = anyChar.satisfies(_.isDigit)
 
   val alphaNum: Parser[Char] = letter <|> digit
 
+  // TODO foldear el string
   val string: String => Parser[String] = target => input => Try {
     var resultParsed: String = ""
-    for((c, i) <- target.zipWithIndex) {
+    for ((c, i) <- target.zipWithIndex) {
       resultParsed += char(c)(input.substring(i)).get._1.toString
     }
     (resultParsed, input.substring(target.length))
