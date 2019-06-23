@@ -24,13 +24,11 @@ package object Parsers {
 
   val alphaNum: Parser[Char] = letter <|> digit
 
-  // TODO foldear el string
-  val string: String => Parser[String] = target => input => Try {
-    var resultParsed: String = ""
-    for ((c, i) <- target.zipWithIndex) {
-      resultParsed += char(c)(input.substring(i)).get._1.toString
-    }
-    (resultParsed, input.substring(target.length))
+  // TODO ver como sacar esta funcion auxiliar y usar el success como semilla del fold
+  private val successString: Parser[String] = input => Success(("", input))
+  val string: String => Parser[String] = _.toList.map(char(_)).foldLeft(successString) { (parserAccum: Parser[String], charParser) =>
+    (parserAccum <> charParser)
+      .map { case (strAccum, charNuevo) => strAccum + charNuevo.toString }
   }
 }
 
