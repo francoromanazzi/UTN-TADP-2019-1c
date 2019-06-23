@@ -24,7 +24,8 @@ package object Combinators {
     } yield (resultParser1, restoParser2)
 
     // TODO testearlo
-    def sepBy(parserSeparador: Parser[T]): Parser[T] = input => ???
+    def sepBy[U](parserSeparador: Parser[U]): Parser[List[T]] = ((parser1.+ <~ parserSeparador) <> parser1.+)
+      .map { case (lista1, lista2) => lista1 ++ lista2 }
 
     // TODO testearlo
     def satisfies(condicion: T => Boolean): Parser[T] = parser1(_).filter { case (resultado, _) => condicion(resultado) }.recover { case _ => throw new ParserException }
@@ -35,13 +36,13 @@ package object Combinators {
     // TODO testearlo
     def * : Parser[List[T]] = input => Success(kleeneWithAccumulator((List(), input)))
 
+    // TODO testearlo
     // @tailrec TODO no me deja anotarlo como tailrec, por qué?
-    private def kleeneWithAccumulator(accum: Parseado[List[T]]): Parseado[List[T]] = {
+    private def kleeneWithAccumulator(accum: Parseado[List[T]]): Parseado[List[T]] =
       parser1(accum._2).fold(
         _ => accum,
         { case (nuevoResultado, nuevoResto) => kleeneWithAccumulator((nuevoResultado :: accum._1, nuevoResto)) }
       )
-    }
 
     // TODO testearlo
     def + : Parser[List[T]] = parser1.*.satisfies(_.nonEmpty)
