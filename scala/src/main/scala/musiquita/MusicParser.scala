@@ -6,11 +6,11 @@ import musiquita.Musica._
 
 package object MusicParser {
 
-  val silencio: Parser[Tocable] = ???
+  val silencio: Parser[Silencio] = ???
 
-  val sonido: Parser[Tocable] = ???
+  val sonido: Parser[Sonido] = ???
 
-  val acorde: Parser[Tocable] = ???
+  val acorde: Parser[Acorde] = ???
 
   val tocable: Parser[Tocable] = silencio <|> sonido <|> acorde
 
