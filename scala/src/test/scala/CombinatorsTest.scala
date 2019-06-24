@@ -103,6 +103,7 @@ class CombinatorsTest extends FreeSpec with Matchers {
         }
       }
     }
+
     "<> (Concat combinator)" - {
       "when combining string(\"hola\") <> string(\"mundo\")" - {
         val holamundo: Parser[(String, String)] = string("hola") <> string("mundo")
@@ -189,6 +190,107 @@ class CombinatorsTest extends FreeSpec with Matchers {
           "if that string is digits separated by a hyphen" - {
             "it parses that telephone number" in {
               assertParsesSucceededWithResult(telNum("4501-2251hola"), ((4501, 2251), "hola"))
+            }
+          }
+        }
+      }
+    }
+
+    "opt" - {
+      "when making optional string(\"in\")" - {
+        val talVezIn: Parser[Any] = string("in").opt
+
+        "when fed an empty string" - {
+          "it succedes, parsing nothing and returning the same input" in {
+            assertParsesSucceededWithResult(talVezIn(""), ((), ""))
+          }
+        }
+
+        "when fed a string with more than one character" - {
+          "if the string starts with that matcher" in {
+            assertParsesSucceededWithResult(talVezIn("infija"), ("in", "fija"))
+          }
+          "if the string doesn't start with that matcher" in {
+            assertParsesSucceededWithResult(talVezIn("fija"), ((), "fija"))
+          }
+        }
+      }
+      "when making optional string(\"in\") and concatenating it with string(\"fija\")" - {
+        val talVezIn: Parser[Any] = string("in").opt
+        val precedencia: Parser[(Any, String)] = talVezIn <> string("fija")
+
+
+        "when fed an empty string" - {
+          "it succedes, parsing nothing and returning the same input" in {
+            assertParseFailed(precedencia(""))
+          }
+        }
+
+        "when fed a string with more than one character" - {
+          "if the string starts with that matcher" in {
+            assertParsesSucceededWithResult(precedencia("infija"), (("in", "fija"), ""))
+          }
+          "if the string doesn't start with that matcher" in {
+            assertParsesSucceededWithResult(precedencia("fija"), (((), "fija"), ""))
+          }
+        }
+      }
+    }
+
+    "*" - {
+      "when applying * to digit" - {
+        val zeroOrMoreDigits: Parser[List[Char]] = digit.*
+
+        "when fed an empty string" - {
+          "it parses an empty list" in {
+            assertParsesSucceededWithResult(zeroOrMoreDigits(""), (List(), ""))
+          }
+        }
+
+        "when fed a string with more than one character" - {
+          "if it doesn't start with a digit" - {
+            "it parses an empty list" in {
+              assertParsesSucceededWithResult(zeroOrMoreDigits("a123"), (List(), "a123"))
+            }
+          }
+          "if it starts with one digit" - {
+            "it parses the single digit" in {
+              assertParsesSucceededWithResult(zeroOrMoreDigits("1a"), (List('1'), "a"))
+            }
+          }
+          "if it starts with more than one digit" - {
+            "it parses the digits" in {
+              assertParsesSucceededWithResult(zeroOrMoreDigits("123a"), (List('1', '2', '3'), "a"))
+            }
+          }
+        }
+      }
+    }
+
+    "+" - {
+      "when applying + to digit" - {
+        val oneOrMoreDigits: Parser[List[Char]] = digit.+
+
+        "when fed an empty string" - {
+          "it fails" in {
+            assertParseFailed(oneOrMoreDigits(""))
+          }
+        }
+
+        "when fed a string with more than one character" - {
+          "if it doesn't start with a digit" - {
+            "it fails" in {
+              assertParseFailed(oneOrMoreDigits("a123"))
+            }
+          }
+          "if it starts with one digit" - {
+            "it parses the single digit" in {
+              assertParsesSucceededWithResult(oneOrMoreDigits("1a"), (List('1'), "a"))
+            }
+          }
+          "if it starts with more than one digit" - {
+            "it parses the digits" in {
+              assertParsesSucceededWithResult(oneOrMoreDigits("123a"), (List('1', '2', '3'), "a"))
             }
           }
         }
