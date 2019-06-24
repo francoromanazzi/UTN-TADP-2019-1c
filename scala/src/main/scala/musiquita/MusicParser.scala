@@ -6,7 +6,10 @@ import musiquita.Musica._
 
 package object MusicParser {
 
-  val silencio: Parser[Silencio] = ???
+  val silencioBlanca: Parser[Silencio] = char('_').map(_ => Silencio(Blanca))
+  val silencioNegra: Parser[Silencio] = char('-').map(_ => Silencio(Negra))
+  val silencioCorchea: Parser[Silencio] = char('~').map(_ => Silencio(Corchea))
+  val silencio: Parser[Silencio] = silencioBlanca <|> silencioNegra <|> silencioCorchea
 
   val sonido: Parser[Sonido] = ???
 
