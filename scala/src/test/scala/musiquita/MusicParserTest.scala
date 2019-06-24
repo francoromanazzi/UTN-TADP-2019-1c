@@ -1,7 +1,8 @@
 package musiquita
 
-import Parsers.ParserException
+import Parsers._
 import MusicParser._
+import Combinators._
 import org.scalatest.{FreeSpec, Matchers}
 
 class MusicParserTest extends FreeSpec with Matchers {
@@ -15,11 +16,20 @@ class MusicParserTest extends FreeSpec with Matchers {
 
   "MusicParser" - {
     "_______________________" in {
-      println(tocable(""))
-      println(tocable("_"))
-      println(tocable("4C1/4"))
-      println(tocable("4C1/4 "))
-      println(tocable("4C1/4 4C1/4"))
+      println(melodia(""))
+      println(melodia("_"))
+      println(melodia("4C1/4"))
+      println(melodia("4C1/4 "))
+      println(melodia("4C1/4 4C1/4"))
+      println(melodia("4C1/4 4C1/4 "))
+
+      println("______")
+
+      val kleene = (tocable <~ char(' ')).* <> tocable
+      println(kleene("4C1/4"))
+      println(kleene("4C1/4 "))
+      println(kleene("4C1/4 4C1/4"))
+      println(kleene("4C1/4 4C1/4 "))
     }
   }
 }

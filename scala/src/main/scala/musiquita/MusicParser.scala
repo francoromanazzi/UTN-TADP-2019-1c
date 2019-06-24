@@ -11,7 +11,7 @@ package object MusicParser {
   val silencioCorchea: Parser[Silencio] = char('~').map(_ => Silencio(Corchea))
   val silencio: Parser[Silencio] = silencioBlanca <|> silencioNegra <|> silencioCorchea
 
-  val octava: Parser[Int] = digit.map(_.toInt)
+  val octava: Parser[Int] = digit.map(_.asDigit)
   val nombreNota: Parser[Nota] = letter.map {
     case 'A' => A
     case 'B' => B
@@ -41,8 +41,8 @@ package object MusicParser {
 
   val tocable: Parser[Tocable] = silencio <|> sonido //<|> acorde
 
-  val melodia: Parser[Melodia] = ((tocable <~ char(' ')).* <> tocable).opt.map {
-    case Some((listaTocables, ultimoTocable)) => listaTocables :+ ultimoTocable
+  val melodia: Parser[Melodia] = (tocable <> (char(' ') ~> tocable).*).opt.map {
+    case Some((primerTocable, listaTocables)) => primerTocable :: listaTocables
     case None => List()
   }
 }
