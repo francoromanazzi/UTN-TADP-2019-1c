@@ -3,6 +3,7 @@ import Parsers._
 import scala.util.Success
 
 package object Combinators {
+
   implicit class ParserExtendido[T](parser1: Parser[T]) {
     def <|>[R >: T, U <: R](parser2: Parser[U]): Parser[R] = input => parser1(input).recoverWith { case _ => parser2(input) }
 
@@ -21,10 +22,12 @@ package object Combinators {
 
     def sepBy[U](parserSeparador: Parser[U]): Parser[(T, T)] = (parser1 <~ parserSeparador) <> parser1
 
-    def satisfies(condicion: T => Boolean): Parser[T] = parser1(_).filter { case (resultado, _) => condicion(resultado) }.recover { case _ => throw new ParserException }
+    def satisfies(condicion: T => Boolean): Parser[T] = {
+      val ret: Parser[T] = parser1(_).filter { case (resultado, _) => condicion(resultado) }
+      ret.customException
+    }
 
-    //def opt: Parser[Option[T]] = input => Success(parser1(input).fold(_ =>(None, input), {case (resultado, resto) => (Some(resultado), resto)}))
-    def opt: Parser[Option[T]] = input => parser1.map(Some(_))(input).recover{ case _ => (None, input)}
+    def opt: Parser[Option[T]] = input => parser1.map(Some(_))(input).recover { case _ => (None, input) }
 
     def * : Parser[List[T]] = input => Success(kleeneWithAccumulator((List(), input)))
 
@@ -42,5 +45,8 @@ package object Combinators {
     def map[U](transformacion: T => U): Parser[U] = input => for {
       (resultado, resto) <- parser1(input)
     } yield (transformacion(resultado), resto)
+
+    def customException: Parser[T] = parser1(_).recover { case _ => throw new ParserException }
   }
+
 }

@@ -11,9 +11,13 @@ package object Parsers {
   type Parser[+T] = Input => Try[Parseado[T]]
 
   def successWithResult[T](value: T): Parser[T] = input => Success((value, input))
+
   //val success: Parser[Unit] = successWithResult(Unit)
 
-  val anyChar: Parser[Char] = input => Try(input(0), input.substring(1)).recover { case _ => throw new ParserException }
+  val anyChar: Parser[Char] = {
+    val ret: Parser[Char] = input => Try(input(0), input.substring(1))
+    ret.customException
+  }
 
   val char: Char => Parser[Char] = char => anyChar.satisfies(_ == char)
 

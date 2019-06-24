@@ -11,14 +11,38 @@ package object MusicParser {
   val silencioCorchea: Parser[Silencio] = char('~').map(_ => Silencio(Corchea))
   val silencio: Parser[Silencio] = silencioBlanca <|> silencioNegra <|> silencioCorchea
 
-  val sonido: Parser[Sonido] = ???
+  val octava: Parser[Int] = digit.map(_.toInt)
+  val nombreNota: Parser[Nota] = digit.map {
+    case 'A' => A
+    case 'B' => B
+    case 'C' => C
+    case 'D' => D
+    case 'E' => E
+    case 'F' => F
+    case 'G' => G
+  }.customException
+  val modificadorNota: Parser[Nota => Nota] = (char('#') <|> char('b')).opt.map{
+    case Some('#') => nota => nota.sostenido
+    case Some('b') => nota => nota.bemol
+    case None => nota => nota
+  }
+  val nota: Parser[Nota] = (nombreNota <> modificadorNota).map{ case (_nota, _modificadorNota) => _modificadorNota(_nota)}
+  val tono: Parser[Tono] = (octava <> nota).map{ case(_octava, _nota) => Tono(_octava, _nota)}
+  val figura: Parser[Figura] = integer.sepBy(char('/')).map {
+    case (1, 1) => Redonda
+    case (1, 2) => Blanca
+    case (1, 4) => Negra
+    case (1, 8) => Corchea
+    case (1, 16) => SemiCorchea
+  }.customException
+  val sonido: Parser[Sonido] = (tono <> figura).map{ case(_tono, _figura) => Sonido(_tono, _figura)}
 
-  val acorde: Parser[Acorde] = ???
+  //val acorde: Parser[Acorde] = ???
 
-  val tocable: Parser[Tocable] = silencio <|> sonido <|> acorde
+  val tocable: Parser[Tocable] = silencio <|> sonido //<|> acorde
 
-  val melodia: Parser[Melodia] = ((tocable <~ char(' ')).* <> tocable.opt).map {
-    case (listaTocables, Some(ultimoTocable)) => listaTocables :+ ultimoTocable
-    case (listaTocables, None) => listaTocables
+  val melodia: Parser[Melodia] = ((tocable <~ char(' ')).* <> tocable).opt.map {
+    case Some((listaTocables, ultimoTocable)) => listaTocables :+ ultimoTocable
+    case None => List()
   }
 }
