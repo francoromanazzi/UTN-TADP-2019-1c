@@ -12,7 +12,7 @@ package object MusicParser {
   val silencio: Parser[Silencio] = silencioBlanca <|> silencioNegra <|> silencioCorchea
 
   val octava: Parser[Int] = digit.map(_.toInt)
-  val nombreNota: Parser[Nota] = digit.map {
+  val nombreNota: Parser[Nota] = letter.map {
     case 'A' => A
     case 'B' => B
     case 'C' => C
@@ -27,7 +27,7 @@ package object MusicParser {
     case None => nota => nota
   }
   val nota: Parser[Nota] = (nombreNota <> modificadorNota).map{ case (_nota, _modificadorNota) => _modificadorNota(_nota)}
-  val tono: Parser[Tono] = (octava <> nota).map{ case(_octava, _nota) => Tono(_octava, _nota)}
+  val tono: Parser[Tono] = (octava <> nota).map{ case (_octava, _nota) => Tono(_octava, _nota)}
   val figura: Parser[Figura] = integer.sepBy(char('/')).map {
     case (1, 1) => Redonda
     case (1, 2) => Blanca
@@ -35,7 +35,7 @@ package object MusicParser {
     case (1, 8) => Corchea
     case (1, 16) => SemiCorchea
   }.customException
-  val sonido: Parser[Sonido] = (tono <> figura).map{ case(_tono, _figura) => Sonido(_tono, _figura)}
+  val sonido: Parser[Sonido] = (tono <> figura).map{ case (_tono, _figura) => Sonido(_tono, _figura)}
 
   //val acorde: Parser[Acorde] = ???
 
