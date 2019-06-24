@@ -23,7 +23,8 @@ package object Combinators {
 
     def satisfies(condicion: T => Boolean): Parser[T] = parser1(_).filter { case (resultado, _) => condicion(resultado) }.recover { case _ => throw new ParserException }
 
-    def opt: Parser[Any] = parser1 <|> success
+    //def opt: Parser[Option[T]] = input => Success(parser1(input).fold(_ =>(None, input), {case (resultado, resto) => (Some(resultado), resto)}))
+    def opt: Parser[Option[T]] = input => parser1.map(Some(_))(input).recover{ case _ => (None, input)}
 
     def * : Parser[List[T]] = input => Success(kleeneWithAccumulator((List(), input)))
 

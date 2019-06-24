@@ -198,20 +198,20 @@ class CombinatorsTest extends FreeSpec with Matchers {
 
     "opt" - {
       "when making optional string(\"in\")" - {
-        val talVezIn: Parser[Any] = string("in").opt
+        val talVezIn: Parser[Option[String]] = string("in").opt
 
         "when fed an empty string" - {
           "it succedes, parsing nothing and returning the same input" in {
-            assertParsesSucceededWithResult(talVezIn(""), ((), ""))
+            assertParsesSucceededWithResult(talVezIn(""), (None, ""))
           }
         }
 
         "when fed a string with more than one character" - {
           "if the string starts with that matcher" in {
-            assertParsesSucceededWithResult(talVezIn("infija"), ("in", "fija"))
+            assertParsesSucceededWithResult(talVezIn("infija"), (Some("in"), "fija"))
           }
           "if the string doesn't start with that matcher" in {
-            assertParsesSucceededWithResult(talVezIn("fija"), ((), "fija"))
+            assertParsesSucceededWithResult(talVezIn("fija"), (None, "fija"))
           }
         }
       }
@@ -228,10 +228,10 @@ class CombinatorsTest extends FreeSpec with Matchers {
 
         "when fed a string with more than one character" - {
           "if the string starts with that matcher" in {
-            assertParsesSucceededWithResult(precedencia("infija"), (("in", "fija"), ""))
+            assertParsesSucceededWithResult(precedencia("infija"), ((Some("in"), "fija"), ""))
           }
           "if the string doesn't start with that matcher" in {
-            assertParsesSucceededWithResult(precedencia("fija"), (((), "fija"), ""))
+            assertParsesSucceededWithResult(precedencia("fija"), ((None, "fija"), ""))
           }
         }
       }
