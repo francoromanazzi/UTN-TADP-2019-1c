@@ -21,13 +21,13 @@ package object MusicParser {
     case 'F' => F
     case 'G' => G
   }.customException
-  val modificadorNota: Parser[Nota => Nota] = (char('#') <|> char('b')).opt.map{
+  val modificadorNota: Parser[Nota => Nota] = (char('#') <|> char('b')).opt.map {
     case Some('#') => nota => nota.sostenido
     case Some('b') => nota => nota.bemol
     case None => nota => nota
   }
-  val nota: Parser[Nota] = (nombreNota <> modificadorNota).map{ case (_nota, _modificadorNota) => _modificadorNota(_nota)}
-  val tono: Parser[Tono] = (octava <> nota).map{ case (_octava, _nota) => Tono(_octava, _nota)}
+  val nota: Parser[Nota] = (nombreNota <> modificadorNota).map { case (unaNota, unModificadorNota) => unModificadorNota(unaNota) }
+  val tono: Parser[Tono] = (octava <> nota).map { case (unaOctava, unaNota) => Tono(unaOctava, unaNota) }
   val figura: Parser[Figura] = integer.sepBy(char('/')).map {
     case (1, 1) => Redonda
     case (1, 2) => Blanca
@@ -35,11 +35,17 @@ package object MusicParser {
     case (1, 8) => Corchea
     case (1, 16) => SemiCorchea
   }.customException
-  val sonido: Parser[Sonido] = (tono <> figura).map{ case (_tono, _figura) => Sonido(_tono, _figura)}
+  val sonido: Parser[Sonido] = (tono <> figura).map { case (unTono, unaFigura) => Sonido(unTono, unaFigura) }
 
-  //val acorde: Parser[Acorde] = ???
+  val acordeExplicito: Parser[Acorde] = ((tono <> (char('+') ~> tono).+) <> figura).map { case ((unTono, unosTonos), unaFigura) => Acorde(unTono :: unosTonos, unaFigura) }
+  val acordeMenorOMayor: Parser[Acorde] = (tono <> (char('m') <|> char('M')) <> figura)
+    .map {
+      case ((unTono, 'M'), unaFigura) => unTono.nota.acordeMayor(unTono.octava, unaFigura)
+      case ((unTono, 'm'), unaFigura) => unTono.nota.acordeMenor(unTono.octava, unaFigura)
+    }
+  val acorde: Parser[Acorde] = acordeExplicito <|> acordeMenorOMayor
 
-  val tocable: Parser[Tocable] = silencio <|> sonido //<|> acorde
+  val tocable: Parser[Tocable] = silencio <|> sonido <|> acorde
 
   val melodia: Parser[Melodia] = (tocable <> (char(' ') ~> tocable).*).opt.map {
     case Some((primerTocable, listaTocables)) => primerTocable :: listaTocables

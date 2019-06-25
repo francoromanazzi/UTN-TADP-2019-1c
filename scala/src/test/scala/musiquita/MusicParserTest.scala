@@ -22,14 +22,6 @@ class MusicParserTest extends FreeSpec with Matchers {
       println(melodia("4C1/4 "))
       println(melodia("4C1/4 4C1/4"))
       println(melodia("4C1/4 4C1/4 "))
-
-      println("______")
-
-      val kleene = (tocable <~ char(' ')).* <> tocable
-      println(kleene("4C1/4"))
-      println(kleene("4C1/4 "))
-      println(kleene("4C1/4 4C1/4"))
-      println(kleene("4C1/4 4C1/4 "))
     }
   }
 }
