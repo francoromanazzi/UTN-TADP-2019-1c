@@ -2,7 +2,7 @@ package musiquita
 
 import Parsers._
 import MusicParser._
-import Combinators._
+import AudioPlayer._
 import org.scalatest.{FreeSpec, Matchers}
 
 class MusicParserTest extends FreeSpec with Matchers {
@@ -15,13 +15,11 @@ class MusicParserTest extends FreeSpec with Matchers {
   }
 
   "MusicParser" - {
-    "_______________________" in {
-      println(melodia(""))
-      println(melodia("_"))
-      println(melodia("4C1/4"))
-      println(melodia("4C1/4 "))
-      println(melodia("4C1/4 4C1/4"))
-      println(melodia("4C1/4 4C1/4 "))
+    "De musica ligera" in {
+      val deMusicaLigera = melodia("_ 3Bm1/8 3Bm1/8 3Bm1/8 3Bm1/8 3GM1/8 3GM1/8 3GM1/8 3GM1/8 4DM1/8 4DM1/8 4DM1/8 4DM1/8 3AM1/8 3AM1/8 3AM1/8 3AM1/8" +
+                                   " 3Bm1/8 3Bm1/8 3Bm1/8 3Bm1/8 3GM1/8 3GM1/8 3GM1/8 3GM1/8 4DM1/8 4DM1/8 4DM1/8 4DM1/8 3AM1/8 3AM1/8 3AM1/8 3AM1/8" +
+                                   " 2B1/8 2B1/8 3C#1/8 3D1/1 ~ 3C#1/8 3D1/8 3C#1/8 2B1/8 2A1/8 2F#1/2 ~ 2B1/2 - -")
+      deMusicaLigera.map { case (melodiaParseada, _) => reproducir(melodiaParseada) }
     }
   }
 }
