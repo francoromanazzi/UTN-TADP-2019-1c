@@ -1,7 +1,7 @@
 package musiquita
 
-import Parsers._
 import Combinators._
+import Parsers._
 import musiquita.Musica._
 
 package object MusicParser {
@@ -21,11 +21,13 @@ package object MusicParser {
     case 'F' => F
     case 'G' => G
   }.customException
-  val modificadorNota: Parser[Nota => Nota] = (char('#') <|> char('b')).opt.map {
-    case Some('#') => nota => nota.sostenido
-    case Some('b') => nota => nota.bemol
-    case None => nota => nota
-  }
+  val modificadorNota: Parser[Nota => Nota] = (char('#') <|> char('b'))
+    .optMap(
+      nota => nota, {
+        case '#' => nota => nota.sostenido
+        case 'b' => nota => nota.bemol
+      })
+
   val nota: Parser[Nota] = (nombreNota <> modificadorNota).map { case (unaNota, unModificadorNota) => unModificadorNota(unaNota) }
   val tono: Parser[Tono] = (octava <> nota).map { case (unaOctava, unaNota) => Tono(unaOctava, unaNota) }
   val figura: Parser[Figura] = integer.sepBy(char('/')).map {
@@ -37,7 +39,10 @@ package object MusicParser {
   }.customException
   val sonido: Parser[Sonido] = (tono <> figura).map { case (unTono, unaFigura) => Sonido(unTono, unaFigura) }
 
-  val acordeExplicito: Parser[Acorde] = ((tono <> (char('+') ~> tono).+) <> figura).map { case ((unTono, unosTonos), unaFigura) => Acorde(unTono :: unosTonos, unaFigura) }
+  val acordeExplicito: Parser[Acorde] = ((tono <> (char('+') ~> tono).+) <> figura)
+    .map {
+      case ((unTono, unosTonos), unaFigura) => Acorde(unTono :: unosTonos, unaFigura)
+    }
   val acordeMenorOMayor: Parser[Acorde] = (tono <> (char('m') <|> char('M')) <> figura)
     .map {
       case ((unTono, 'M'), unaFigura) => unTono.nota.acordeMayor(unTono.octava, unaFigura)
@@ -47,8 +52,6 @@ package object MusicParser {
 
   val tocable: Parser[Tocable] = silencio <|> sonido <|> acorde
 
-  val melodia: Parser[Melodia] = (tocable <> (char(' ') ~> tocable).*).opt.map {
-    case Some((primerTocable, listaTocables)) => primerTocable :: listaTocables
-    case None => List()
-  }
+  val melodia: Parser[Melodia] = (tocable <> (char(' ') ~> tocable).*)
+    .optMap(List(), { case (primerTocable, listaTocables) => primerTocable :: listaTocables })
 }

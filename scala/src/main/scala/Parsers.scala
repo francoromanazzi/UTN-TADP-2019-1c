@@ -10,10 +10,6 @@ package object Parsers {
   type Parseado[+T] = (T, Input)
   type Parser[+T] = Input => Try[Parseado[T]]
 
-  def successWithResult[T](value: T): Parser[T] = input => Success((value, input))
-
-  //val success: Parser[Unit] = successWithResult(Unit)
-
   val anyChar: Parser[Char] = {
     val ret: Parser[Char] = input => Try(input(0), input.substring(1))
     ret.customException
@@ -29,7 +25,7 @@ package object Parsers {
 
   val alphaNum: Parser[Char] = letter <|> digit
 
-  // TODO ver si se puede foldear sin semilla
+  private def successWithResult[T](value: T): Parser[T] = input => Success((value, input))
   val string: String => Parser[String] = _.toList.map(char(_)).foldLeft(successWithResult("")) { (parserAccum: Parser[String], charParser) =>
     (parserAccum <> charParser)
       .map { case (strAccum, charNuevo) => strAccum + charNuevo.toString }

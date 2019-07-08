@@ -3,7 +3,6 @@ import Parsers._
 import scala.util.Success
 
 package object Combinators {
-
   implicit class ParserExtendido[T](parser1: Parser[T]) {
     def <|>[R >: T, U <: R](parser2: Parser[U]): Parser[R] = input => parser1(input).recoverWith { case _ => parser2(input) }
 
@@ -30,8 +29,6 @@ package object Combinators {
     def opt: Parser[Option[T]] = input => parser1.map(Some(_))(input).recover { case _ => (None, input) }
 
     def * : Parser[List[T]] = input => Success(kleeneWithAccumulator((List(), input)))
-
-    // @tailrec TODO no me deja anotarlo como tailrec, por qué?
     private def kleeneWithAccumulator(accum: Parseado[List[T]]): Parseado[List[T]] =
       parser1(accum._2).fold(
         _ => accum,
@@ -46,7 +43,11 @@ package object Combinators {
       (resultado, resto) <- parser1(input)
     } yield (transformacion(resultado), resto)
 
+    def optMap[U](none: => U, fSome: T => U): Parser[U] = opt.map {
+      case Some(value) => fSome(value)
+      case None => none
+    }
+
     def customException: Parser[T] = parser1(_).recover { case _ => throw new ParserException }
   }
-
 }
